@@ -1,0 +1,32 @@
+M1 M2 M4 E/A Qvalue (MeV)
+206.,2.,1.,7.38,0.
+Bz q Rmagnet (cm) inhomogeneity Bz (%)
+2.5,1.,45.,0.5
+Rdetector z1 z2 (cm)
+3.,-10.,-60.
+pitch_z pitch_x (mm) FWHM E det (KeV) E4 threshold (MeV) 
+0.95,2.0,50.,2.7
+target th. (mg/cm**2)  beam dE/dx  ejectile dE/dx filename  beam stopping flag   ejectile stopping flag
+0.165,116.5,proton_srim.txt,1,1
+no. targets for beam mult scat   beam Z   ejectile mult scat flag  beam straggling (%)  ejectile straggling (%)
+1,80,1,5.,40.
+fwhm beam spot (mm)  fwhm energy spread (%)  fwhm beam divergence (mrad)
+2.3,0.4,1.8
+number of passes
+100.
+M1 M2 M4 E/A Qvalue (MeV)
+206.,2.,1.,7.38,0.
+Bz q Rmagnet (cm) inhomogeneity Bz (%)
+2.5,1.,35.,0.5
+Rpad z1 interactions_start (cm)
+5.5,-20.,-15.
+FWHM z (mm) pitch_Rpad FWHM E det (KeV) E4 threshold (MeV) 
+1.0,3.0,50.,2.7
+target th. (torr)  beam dE/dx  ejectile dE/dx filename  beam stopping flag   ejectile stopping flag
+50.,147.4,proton_on_deuterium_srim.txt,0,0
+beam mult scat flag   beam Z   ejectile mult scat flag  beam straggling (%)  ejectile straggling (%)
+1,80,1,3.,20.
+fwhm beam spot (mm)  fwhm energy spread (%)  fwhm beam divergence (mrad)
+2.3,0.4,1.8
+no. of passes
+100
