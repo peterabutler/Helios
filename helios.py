@@ -1,12 +1,12 @@
 # HELIOS simulations.  PA Butler  April 2014.  Modified for active gas volume mode June 2022.
-# converted from QuickBasic to Python June 2024
+# Python version created June 2024
 
 
 import sys
 import array
 import math
 import random
-
+random.seed()
 
 def multi_scatter(Z, A, Q, T, D):
  K = .0393 / 1000. * Z * (Z + 1.) * Q ** 2 * D / A / T ** 2
@@ -35,9 +35,9 @@ reaction_label = (f.readline())
 
 f.close()
 
-file_name = folder_name + "\\input_" + reaction_label + ".txt" 
+file_name = folder_name + "/input_" + reaction_label + ".txt" 
 file_in = open(file_name,"r")
-file_name = folder_name + "\\output_" + reaction_label + ".txt"
+file_name = folder_name + "/output_" + reaction_label + ".txt"
 file_out = open(file_name,"w")
 
 target = 0.
@@ -79,7 +79,7 @@ while idum != 0:
     
     
 
-    M4_stop_filename = "srim_files\\" + M4_stop_file
+    M4_stop_filename = "srim_files/" + M4_stop_file
 
     stop_file_in =open(M4_stop_filename,"r")
 
@@ -1037,11 +1037,11 @@ while idum != 0:
             
 
             
-            zi = z * 1.0E5
+            zi = z * 1E5
             kz = int(zi / pitch_z)
             z_meas = (kz * pitch_z) / 1.0E5 + 0.5 * pitch_zmm / 1000.
 
-            xi = x * 1.0E5
+            xi = x * 1E5
             kx = int(xi / pitch_x)
             x_meas = (kx * pitch_x) / 1.0E5 + 0.5 * pitch_xmm / 1000.
 
@@ -1103,7 +1103,7 @@ while idum != 0:
 
                 if abs(z_corr - z_corr_prev) < 0.0001:
                  converge = 1
-                 continue
+                 break
                 
             
             if converge == 0:
@@ -1163,6 +1163,7 @@ while idum != 0:
             Q_store_pass.append(Qvalue_corr)
             
             Q_store_loops.append(Qvalue_corr)
+            
             
             v_diff_sq_sum = (vend - v) * (vend - v) + v_diff_sq_sum
             v_sum = v_sum + v
