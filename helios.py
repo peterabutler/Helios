@@ -21,8 +21,10 @@ def multi_scatter(Z, A, Q, T, D):
  return F
  # RMS scattering angle in radians, taken from Kantele's handbook
  
- 
- 
+Q_store_loops = [0.] * 100000 
+Q_store_pass = [0.] * 100000 
+energy4 = [0.] * 1000
+dedx4 = [0.] * 1000
 
 plot = 0
 sintheta_weighting = 0
@@ -177,8 +179,7 @@ while idum != 0:
  
        
     ii = 0
-    energy4 = []
-    dedx4 = []
+
     with stop_file_in as inputfile:
      while True:
       line = (inputfile.readline())
@@ -186,15 +187,18 @@ while idum != 0:
         break
       ii=ii + 1
       energy4_in, dedx4_in = line.split(',')
-      energy4.append(float(energy4_in))
-      dedx4.append(float(dedx4_in))
+
+      energy4[ii] = float(energy4_in)         
+      dedx4[ii] = float(dedx4_in)
+      
     ii_max = ii
     
     stop_file_in.close()
     
     def interpolate(x):
       IST = 0
-      for I in range(0, ii_max):
+      for I in range(1, ii_max+1):
+
        if energy4[I] <= x and energy4[I+1] >= x:
         IST = I
         break
@@ -456,7 +460,8 @@ while idum != 0:
     error_poor_Q = 0
     loops = 0
     good_loops = 0
-    Q_store_loops = []
+    
+    
     
  
    
@@ -466,7 +471,6 @@ while idum != 0:
         print(thetacm_str, end="\r", flush=True) # this prints at the same location on the screen
         pass_loop = 0
         good_pass = 0
-        Q_store_pass = []
         
         E4_sum = 0.
         zeta_sum = 0.
@@ -1160,10 +1164,10 @@ while idum != 0:
             good_pass = good_pass + 1
             
 
-            Q_store_pass.append(Qvalue_corr)
             
-            Q_store_loops.append(Qvalue_corr)
-            
+            Q_store_pass[good_pass] = Qvalue_corr
+                       
+            Q_store_loops[good_loops] = Qvalue_corr
             
             v_diff_sq_sum = (vend - v) * (vend - v) + v_diff_sq_sum
             v_sum = v_sum + v
@@ -1210,18 +1214,17 @@ while idum != 0:
         
             Q_pass_sum = 0.
  
-    
-            for n in range(0, good_pass):
+            for n in range(1, good_pass+1):
+            
                 Q_pass_sum = Q_pass_sum + Q_store_pass[n]
            
-
             Q_pass_average = Q_pass_sum / good_pass
         
             sigma_pass_sq = 0.
-            for n in range(0, good_pass):
+            for n in range(1, good_pass+1):
+            
                 sigma_pass_sq = sigma_pass_sq + (Q_store_pass[n] - Q_pass_average) * (Q_store_pass[n] - Q_pass_average)
            
-
             sigma_pass = math.sqrt(sigma_pass_sq / good_pass) * 1000.
             fwhm_pass = 2.35 * sigma_pass
             
@@ -1255,23 +1258,21 @@ while idum != 0:
 
      Q_sum = 0.
     
-       
-     for n in range(0,good_loops): 
+     for n in range(1,good_loops+1):  
+     
         Q_sum = Q_sum + Q_store_loops[n]
    
-
-
      Q_average = Q_sum / good_loops
     
 
      file_out.write("\n")
 
      sigma_sq = 0.
-     for n in range(0,good_loops):
+     for n in range(1,good_loops+1):
+     
         sigma_sq = sigma_sq + (Q_store_loops[n] - Q_average) * (Q_store_loops[n] - Q_average)
     
     
-
      file_out.write("\n")
     
      sigma = math.sqrt(sigma_sq / good_loops) * 1000.
