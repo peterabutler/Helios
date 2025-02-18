@@ -131,7 +131,10 @@ while idum != 0:
     if target > 1: active_flag = 1
 
     # if value of target thickness is greater than 1, then this value is assumed to be the gas pressure (in torr) of an active target
-        
+ 
+    density_760 = 0.
+    #  this statement has been inserted February 2025
+ 
     if active_flag == 1:
         s_travel_increment = 0.01
         density_760 = 0.
@@ -253,7 +256,8 @@ while idum != 0:
     window_thickness = 0.1
     # for active target this is window foil thickness in mg/cm**2
     
-
+    pitch_rpadmm = 0.
+    # this line inserted February 2025
    
     
     Rpadcm = 5.5
@@ -278,8 +282,9 @@ while idum != 0:
     if active_flag == 1:
         FWHM_z_padmm = pitch_zmm
         pitch_rpadmm = pitch_xmm
-        pitch_zmm = 0.95
-        pitch_xmm = 2.0
+        # pitch_zmm = 0.95
+        # pitch_xmm = 2.0
+        # above 2 lines commented out for this python version of the code
    
     
     if FWHM_z_padmm < 0.02 and active_flag == 1:
@@ -376,8 +381,10 @@ while idum != 0:
     
     file_out.write("M1 = " + M1_str+ " M2 = " + M2_str + " M3 = " + M3_str + " M4 = " + M4_str + " Beam energy = " + EoA_str + " MeV/A" + "  Q value = " + Qvalue_str +" MeV\n" )
     file_out.write("Bz =" + Bz_str + " T" + "  q = " + charge_state_str + "  T cyc = " + Tcyc_ns_str + " ns\n")
-    file_out.write("Qvalue (MeV) = " + AA_str + " *E4 (MeV) + " + BB_str + " - " + CC_str + " *z (cm) \n")
-    
+    if BB > 0.:
+        file_out.write("Qvalue (MeV) = " + AA_str + " *E4 (MeV) + " + BB_str + " - " + CC_str + " *z (cm) \n")
+    else:
+        file_out.write("Qvalue (MeV) = " + AA_str + " *E4 (MeV) " + BB_str + " - " + CC_str + " *z (cm) \n")
     mass = M4 * 1.66054E-27
 
     q = charge_state * 1.60218E-19 
@@ -403,13 +410,14 @@ while idum != 0:
         file_out.write("  beam stopping flag = " + str(beam_stop) + "  ejectile stopping flag = " + str(eject_stop) +"\n")
 
     else:
-        file_out.write("inner radius pad detector = " + str(Rpadcm) + "cm" + "   radius Si detector = " + str(Rdetcm) + "cm" + "  detector between " + str(z1detcm) + "and " + str(z2detcm) + "cm" + "    radius magnet = " + str(Rmagnetcm) + "cm" + "    inhomogeneity in Bz = " + str(inhomo_Bz_percent) + "% \n")
+        file_out.write("inner radius pad detector = " + str(Rpadcm) + "cm" + "   radius Si detector = " + str(Rdetcm) + "cm" + "  detector between " + str(z1detcm) + " and " + str(z2detcm) + "cm" + "    radius magnet = " + str(Rmagnetcm) + "cm" + "    inhomogeneity in Bz = " + str(inhomo_Bz_percent) + "% \n")
         file_out.write ("Si pitch z = " + str(pitch_zmm) + "mm" + "    pitch x = " + str(pitch_xmm) + "mm" + "     pad FWHM z =" + str(FWHM_z_padmm) + "mm" + "    pitch pad = " + str(pitch_rpadmm) + "mm" + "     Si FWHM E4 =" + str(fwhm_E4keV) + " keV    E4 threshold =" + str(E4_thresh_MeV) + " MeV \n")
         file_out.write("gas pressure = " + str(target) + " torr" + "  between 0 and " + str(z_interact_startcm) + "cm \n")
         file_out.write("beam stopping = " + str(M1_stop) + " MeV/mg/cm**2" + "     ejectile stopping power file: " + M4_stop_file )
         file_out.write("  beam stopping flag = " + str(beam_stop) + "  ejectile stopping flag = " + str(eject_stop) +"\n")
     file_out.write("Z beam = " + str(int(Z_beam)))
-    file_out.write("  beam charge state = " + str(int(charge_state_beam)))
+    file_out.write("  beam charge state = ")
+    file_out.write("%5.1f"% (charge_state_beam))
     file_out.write("  Z target = " + str(int(Z_target)) + "  A target = " + str(int(A_target)))
     file_out.write("   ejectile multiple scattering flag = " + str(ii_eject_scat))
     if ii_scat_max > 0:
@@ -615,7 +623,8 @@ while idum != 0:
             
             # if trajectory radius of ejectile exceeds detector radius by 1cm discontinue theta loop
             
-
+            sigma_scat_beam_deg = 0.
+            sigma_scat_beam_foil_deg = 0.
             if ii_scat_max > 0 and target > 0:
                 sigma_scat_beam_deg = multi_scatter(Z_target, A_target, charge_state_beam, E0, D_thick) / scatter_factor * (180. / pi)
                 sigma_scat_beam_foil_deg = 0.
@@ -1073,9 +1082,22 @@ while idum != 0:
                     
                     # estimate of total distance between vertex and intersection of ejectile trajectory with beam axis.  Starting Q value is nominal
 
-                    zeta_meas = math.acos(z_corr * charge_state * Bz / (z_factor * math.sqrt(E4_meas * M4)))
+                    trig = z_corr * charge_state * Bz / (z_factor * math.sqrt(E4_meas * M4))
+                    if trig > 1.: trig = 1.
+                    if trig < -1.: trig = -1.
+                    if trig < -1.: trig = -1.
+                    
+                    # checks included in Python version of the code 
+                                       
+                    zeta_meas = math.acos(trig)
                     rho_max_meas = rho_max_factor * math.sqrt(E4_meas * M4) * math.sin(zeta_meas) / (charge_state * Bz)
-                    alpha = 2 * math.asin(R_meas_pad / rho_max_meas)
+                    trig = R_meas_pad / rho_max_meas
+                    if trig > 1.:trig = 1.
+                    if trig < -1.: trig = -1.
+                    
+                    # checks included in Python version of the code 
+                    
+                    alpha = 2 * math.asin(trig)
                     Delta_z_pad = -z_corr * alpha / (2. * pi)
                     z_vertex = z_meas_pad + Delta_z_pad
                     
@@ -1092,9 +1114,21 @@ while idum != 0:
 
                 
                 for jj in range(1,6):
-                    zeta_meas = math.acos(z_corr * charge_state * Bz / (z_factor * math.sqrt(E4_meas * M4)))
+                    trig = z_corr * charge_state * Bz / (z_factor * math.sqrt(E4_meas * M4))
+                    if trig > 1.: trig =1.
+                    if trig < -1.: trig = -1.
+                    
+                    # checks included in Python version of the code 
+                                        
+                    zeta_meas = math.acos(trig)
                     rho_max_meas = rho_max_factor * math.sqrt(E4_meas * M4) * math.sin(zeta_meas) / (charge_state * Bz)
-                    alpha = 2. * math.asin(R_meas / rho_max_meas)
+                    trig = R_meas / rho_max_meas
+                    if trig > 1.: trig = 1.
+                    if trig < -1.: trig = -1.
+                                      
+                    # checks included in Python version of the code 
+                      
+                    alpha = 2. * math.asin(trig)
                     Delta_z_Si = z_corr * alpha / (2. * pi)
                     z_corr = z_meas + Delta_z_Si - z_vertex
                     

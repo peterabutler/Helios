@@ -19,14 +19,14 @@ sintheta_weighting% = 0
 
 RANDOMIZE TIMER
 
-OPEN "HELIOS\reaction.txt" FOR INPUT AS #4
+OPEN "reaction.txt" FOR INPUT AS #4
 LINE INPUT #4, folder_name$
 LINE INPUT #4, reaction_label$
 
-file_in$ = "HELIOS\" + folder_name$ + "\input_" + reaction_label$ + ".txt"
+file_in$ = folder_name$ + "\input_" + reaction_label$ + ".txt"
 OPEN file_in$ FOR INPUT AS #1
 
-file_out$ = "HELIOS\" + folder_name$ + "\output_" + reaction_label$ + ".txt"
+file_out$ = folder_name$ + "\output_" + reaction_label$ + ".txt"
 OPEN file_out$ FOR OUTPUT AS #2
 
 Ez = 2500 / 0.15
@@ -73,7 +73,7 @@ DO WHILE NOT EOF(1)
     END IF
     
     IF plot% = 1 AND file_plot_open% = 0 THEN
-        file_plot$ = "HELIOS\" + folder_name$ + "\plot_" + reaction_label$ + ".txt"
+        file_plot$ = folder_name$ + "\plot_" + reaction_label$ + ".txt"
         OPEN file_plot$ FOR OUTPUT AS #5
         file_plot_open% = 1
     END IF
@@ -86,7 +86,7 @@ DO WHILE NOT EOF(1)
     
     
 
-    M4_stop_filename$ = "HELIOS\srim_files\" + M4_stop_file$
+    M4_stop_filename$ = "srim_files\" + M4_stop_file$
 
     OPEN M4_stop_filename$ FOR INPUT AS #3
 
@@ -137,6 +137,9 @@ DO WHILE NOT EOF(1)
 
     REM if value of target thickness is greater than 1, then this value is assumed to be the gas pressure (in torr) of an active target
         
+    density_760 = 0.
+    REM this statement has been inserted February 2025
+
     IF active_flag% = 1 THEN
         s_travel_increment = 0.01
         density_760 = 0.
@@ -204,7 +207,10 @@ DO WHILE NOT EOF(1)
     REM radius of magnet
     
     scatter_factor = 1.
-    
+	
+    z_interact_startcm = 0.
+    REM    this line inserted February 2025 
+
     IF active_flag% = 1 THEN
     
         scatter_factor = scatter_factor_active
@@ -235,6 +241,9 @@ DO WHILE NOT EOF(1)
     
     Rpadcm = 5.5
     cent% = 0
+	
+	pitch_rpadmm = 0.
+    REM this line inserted February 2025
 
     IF cent% = 0 AND active_flag% = 1 THEN
         Rpadcm = Rdetcm
@@ -592,10 +601,15 @@ DO WHILE NOT EOF(1)
             END IF
             
             REM if trajectory radius of ejectile exceeds detector radius by 1cm discontinue theta loop
+            
+			sigma_scat_beam_deg = 0.
+			sigma_scat_beam_foil_deg = 0.
+
+			REM bug corrected 21/7/24 - these variables not initialised if scattering flags set to zero
 
             IF ii_scat_max% > 0 AND target > 0 THEN
                 sigma_scat_beam_deg = multi_scatter(Z_target, A_target, charge_state_beam, E0, D_thick) / scatter_factor * (180. / pi#)
-                sigma_scat_beam_foil_deg = 0.
+                
                 
                 IF active_flag% = 1 THEN
                     sigma_scat_beam_foil_deg = multi_scatter(6, 12, charge_state_beam, E0, 0.05) / scatter_factor * (180. / pi#)
@@ -1175,6 +1189,12 @@ DO WHILE NOT EOF(1)
             E4_loss_sum = E4_loss_sum + (E4_start - E4#)
             thetacm_meas_sum = thetacm_meas_sum + thetacm_meas
             
+            REM
+            REM  IF (thetacm > 10.99 AND thetacm < 11.01) THEN
+            REM      PRINT #2, Q_store_pass(good_pass&); "    "; E4#; "    "; E4_meas#; "    "; z_corr#
+            REM  END IF
+            REM   For small theta_cm the large z correction is strongly correlated to the measured energy in the Si array, resulting in a smaller overall spread in Q values.
+            REM
             
             10
 
