@@ -421,7 +421,7 @@
        ENDIF
 
        WRITE(2,110) M1_stop, M4_stop_file
-110    FORMAT("beam stopping =",F6.1," MeV/mg/cm**2", "     ejectile stopping power file: ",A20,$)
+110    FORMAT("beam stopping =",F6.1," MeV/mg/cm**2", "     ejectile stopping power file: ",A30,$)
        WRITE(2,111) beam_stop, eject_stop
 111    FORMAT("  beam stopping flag =", I2,"  ejectile stopping flag =",I2)
        WRITE(2,115)Z_beam
@@ -442,7 +442,7 @@
        WRITE(2,121)scatter_factor
 121    FORMAT("multiple scattering factor =", F6.1)  
        WRITE(2,122)fwhm_beam_straggle_percent, fwhm_eject_straggle_percent
-122    FORMAT("FWHM beam straggling =",F5.1,"% of energy loss", "  FWHM ejectile straggling = ", F5.1, "% of energy loss")
+122    FORMAT("FWHM beam straggling =",F5.0,"% of energy loss", "  FWHM ejectile straggling = ", F5.0, "% of energy loss")
        WRITE(2,123)fwhm_beam_spot_mm, fwhm_E0_percent, fwhm_diverg_mrad
 123    FORMAT("FWHM beam spot =", F5.1, "mm", "  FWHM beam energy spread =", F5.1, "%", &
                "  FWHM beam divergence =", F5.1,"mrad")
@@ -897,9 +897,9 @@
 !     total distance travelled by ejectile
             
                 r_from_target = SQRT(x * x + y * y + z * z)
-                Bzz = Bz - (r_from_target / 0.5) ** 2 * inhomo_Bz
-                Bx = x * z * inhomo_Bz / 0.5 ** 2
-                By = y * z * inhomo_Bz / 0.5 ** 2
+                Bzz = Bz - (((r_from_target / 0.5) ** 2) * inhomo_Bz)
+                Bx = x * z * inhomo_Bz / (0.5 ** 2)
+                By = y * z * inhomo_Bz / (0.5 ** 2)
 
 !    include effect of field inhomogeneity
                 
@@ -1322,9 +1322,9 @@
             WRITE(2,131) thetacm, E4_av,  zeta_av, tns_av, zcm_av,  Qvalue_uncorr_av, z_change_padcm, z_changecm_av,  &
                    z_vertexcm_av, tns_corr_av, z_corrcm_av, Qvalue_corr_av, fwhm_pass, rho_max_cm_av, radius_maxcm,        &
                    s_travelcm_tot_av, E4_loss_av, thetacm_meas_av, efficiency
-131         FORMAT(      F5.2,6X, F5.2,2X,F7.2,4X, F4.1,1X F7.2,3X, F5.2,3X,          F4.2,4X,        F6.2,4X,       F6.2,2X,      &  
+131         FORMAT(      F5.2,6X, F5.2,2X,F7.2,4X, F4.1,1X F7.2,3X, F5.2,3X,          F5.2,3X,        F6.2,4X,       F6.2,2X,      &  
                      F6.2,2X,     F6.2,2X,     F6.2,3X,        F6.1,3X,   F5.2,3X,       F5.2,3X,        &   
-                     F5.2,3X,           F6.3,3X,    F5.2,2X,         F5.0)
+                     F6.2,2X,           F6.3,3X,    F5.2,2X,         F5.0)
 
         ELSE
         
@@ -1381,7 +1381,7 @@
 134    FORMAT("average rms velocity error = ",F6.4," %")
 
        WRITE(2,135)Q_average, sigma, fwhm
-135    FORMAT("average measured Q value = ",F6.3, " MeV    standard deviation = ",F4.1," keV  FWHM = ",F4.1," keV")
+135    FORMAT("average measured Q value = ",F6.3, " MeV    standard deviation = ",F4.1," keV  FWHM = ",F5.1," keV")
 
        WRITE(2,133)
 

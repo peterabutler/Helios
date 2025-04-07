@@ -836,12 +836,12 @@ DO WHILE NOT EOF(1)
                 REM total distance travelled by ejectile
             
                 r_from_target = SQR(x# * x# + y# * y# + z# * z#)
-                Bzz = Bz - (r_from_target / 0.5) ^ 2 * inhomo_Bz
-                Bx = x * z * inhomo_Bz / 0.5 ^ 2
-                By = y * z * inhomo_Bz / 0.5 ^ 2
-
+                Bzz = Bz - (((r_from_target / 0.5) ^ 2) * inhomo_Bz)
+                Bx = x# * z# * inhomo_Bz / (0.5 ^ 2)
+                By = y# * z# * inhomo_Bz / (0.5 ^ 2)
+								
                 REM include effect of field inhomogeneity
-                
+                REM expressions for Bx, By gave zero values. Corrected 7th April 2025
 
             
                       
